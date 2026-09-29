@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen Sumatif Tengah Semester PKN - MA Muallimin NU Kota Malang</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER / NAVBAR -->
+    <header id="app-header" class="bg-emerald-800 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center gap-3">
+                <div id="logo-container" class="bg-white p-1 rounded-lg text-emerald-900 font-bold text-xl px-3 flex items-center justify-center shadow">
+                    NU
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">MA MUALLIMIN NU KOTA MALANG</h1>
+                    <p class="text-xs text-emerald-200">Asesmen Sumatif Tengah Semester (STS) PKN Kelas XII</p>
+                </div>
+            </div>
+            <div id="header-user-info" class="text-sm flex items-center gap-4 hidden">
+                <span id="header-identity" class="bg-emerald-900/60 px-3 py-1 rounded-full text-emerald-100 border border-emerald-700"></span>
+                <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 rounded text-xs transition font-medium">Keluar</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <!-- VIEW: LOGIN -->
+        <div id="view-login" class="max-w-md mx-auto bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden mt-10">
+            <div class="bg-gradient-to-r from-emerald-800 to-emerald-900 p-6 text-white text-center">
+                <h2 class="text-xl font-bold">Portal Ujian PKN</h2>
+                <p class="text-xs text-emerald-200 mt-1">Penyusun: Eggy Fachrezha Musthofa</p>
+            </div>
+            <div class="p-6">
+                <!-- Tab Selector -->
+                <div class="flex border-b border-slate-200 mb-6">
+                    <button onclick="switchLoginTab('siswa')" id="tab-siswa" class="flex-1 pb-3 text-sm font-semibold text-emerald-800 border-b-2 border-emerald-800 transition">Siswa</button>
+                    <button onclick="switchLoginTab('admin')" id="tab-admin" class="flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent transition">Admin / Guru</button>
+                </div>
+
+                <!-- Form Login Siswa -->
+                <form id="form-login-siswa" onsubmit="loginSiswa(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Nama Lengkap</label>
+                        <input type="text" id="siswa-nama" required placeholder="Contoh: Ahmad Fauzi" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Kelas</label>
+                        <select id="siswa-kelas" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-white">
+                            <option value="">-- Pilih Kelas --</option>
+                            <option value="12 MIPA 1">12 MIPA 1</option>
+                            <option value="12 MIPA 2">12 MIPA 2</option>
+                            <option value="12 IPS 1">12 IPS 1</option>
+                            <option value="12 IPS 2">12 IPS 2</option>
+                            <option value="12 Agama">12 Agama</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-2.5 rounded-lg transition text-sm shadow">Mulai Ujian</button>
+                </form>
+
+                <!-- Form Login Admin -->
+                <form id="form-login-admin" onsubmit="loginAdmin(event)" class="space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Username Admin</label>
+                        <input type="text" id="admin-user" required placeholder="admin" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Password</label>
+                        <input type="password" id="admin-pass" required placeholder="••••••••" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2.5 rounded-lg transition text-sm shadow">Masuk Dashboard</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- VIEW: DASHBOARD SISWA (Pemberitahuan / Riwayat) -->
+        <div id="view-siswa-dashboard" class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg border border-slate-100 p-6 hidden">
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Selamat Datang, <span id="dash-nama"></span></h2>
+            <p class="text-sm text-slate-600 mb-6">Kelas: <span id="dash-kelas" class="font-medium"></span></p>
+
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r-lg text-sm text-amber-900">
+                <p class="font-semibold mb-1">Ketentuan Ujian:</p>
+                <ul class="list-disc pl-5 space-y-1 text-xs">
+                    <li>Jumlah Soal: 50 Soal (25 PG, 10 PG Kompleks, 10 Menjodohkan, 5 Isian Singkat).</li>
+                    <li>Waktu Pengerjaan: 90 menit (Berjalan otomatis begitu ujian dimulai).</li>
+                    <li>KKM: 80.</li>
+                    <li>Kesempatan Pengerjaan Tersisa: <span id="sisa-kesempatan" class="font-bold">10</span> dari 10 kali.</li>
+                </ul>
+            </div>
+
+            <div id="riwayat-container" class="mb-6">
+                <h3 class="text-sm font-bold text-slate-700 mb-2">Riwayat Pengerjaan Anda:</h3>
+                <div id="list-riwayat" class="space-y-2 max-h-40 overflow-y-auto text-xs"></div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="mulaiUjian()" id="btn-mulai-ujian" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-lg transition shadow text-sm">Mulai Kerjakan Soal (50 Soal)</button>
+            </div>
+        </div>
+
+        <!-- VIEW: UJIAN (KERJAKAN SOAL) -->
+        <div id="view-ujian" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Area Soal Utama -->
+                <div class="lg:col-span-3 bg-white rounded-xl shadow-md border p-6 flex flex-col justify-between min-h-[500px]">
+                    <div>
+                        <div class="flex justify-between items-center border-b pb-3 mb-4">
+                            <span id="label-nomor-soal" class="font-bold text-emerald-800 text-base">Soal No. 1</span>
+                            <span id="label-tipe-soal" class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-medium">Pilihan Ganda</span>
+                        </div>
+                        <div id="konten-soal" class="text-sm leading-relaxed text-slate-700 mb-6 font-medium">
+                            <!-- Teks Soal -->
+                        </div>
+                        <div id="konten-opsi" class="space-y-3">
+                            <!-- Pilihan Jawaban -->
+                        </div>
+                    </div>
+
+                    <!-- Navigasi Bawah Soal -->
+                    <div class="flex justify-between items-center border-t pt-4 mt-6">
+                        <button onclick="soalSebelumnya()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-xs font-semibold transition">Sebelumnya</button>
+                        <button onclick="soalBerikutnya()" id="btn-next" class="bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2 rounded-lg text-xs font-semibold transition">Selanjutnya</button>
+                    </div>
+                </div>
+
+                <!-- Sidebar Timer & Navigasi Nomor -->
+                <div class="space-y-4">
+                    <div class="bg-white rounded-xl shadow-md border p-4 text-center">
+                        <span class="text-xs font-bold uppercase text-slate-400 block mb-1">Sisa Waktu Ujian</span>
+                        <div id="timer-display" class="text-2xl font-black text-rose-600">01:30:00</div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-md border p-4">
+                        <span class="text-xs font-bold uppercase text-slate-400 block mb-3">Nomor Soal (50)</span>
+                        <div id="grid-nomor" class="grid grid-cols-5 gap-1.5 max-h-64 overflow-y-auto pr-1">
+                            <!-- Nomor Soal Genereted by JS -->
+                        </div>
+                        <button onclick="konfirmasiSelesai()" class="w-full mt-4 bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-2 rounded-lg text-xs transition shadow">Selesai & Kirim Ujian</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: HASIL UJIAN SISWA -->
+        <div id="view-hasil" class="max-w-xl mx-auto bg-white rounded-xl shadow-lg border p-8 text-center hidden">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-800 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">✓</div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-1">Ujian Selesai!</h2>
+            <p class="text-xs text-slate-500 mb-6">Hasil asesmen sumatif tengah semester Anda telah direkam.</p>
+
+            <div class="bg-slate-50 border rounded-xl p-4 mb-6 grid grid-cols-2 gap-4 text-left text-sm">
+                <div>
+                    <span class="text-xs text-slate-400 block">Nama Siswa</span>
+                    <strong id="hasil-nama" class="text-slate-700">-</strong>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">Kelas</span>
+                    <strong id="hasil-kelas" class="text-slate-700">-</strong>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">Skor / Nilai Akhir</span>
+                    <strong id="hasil-skor" class="text-xl text-emerald-700 font-black">0</strong>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">Keterangan KKM (80)</span>
+                    <strong id="hasil-kkm" class="text-sm font-bold">-</strong>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="downloadHasilPDF()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-lg text-xs font-medium transition shadow">Download Hasil (PDF/Print)</button>
+                <button onclick="kembaliKeDashboardSiswa()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-2.5 rounded-lg text-xs font-medium transition shadow">Kembali ke Menu</button>
+            </div>
+        </div>
+
+        <!-- VIEW: DASHBOARD ADMIN -->
+        <div id="view-admin" class="hidden space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-xl shadow-md border">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">Panel Admin / Guru PKN</h2>
+                    <p class="text-xs text-slate-500">Kelola soal, logo, atur sandi, uji coba ujian, dan unduh nilai siswa.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="adminUjiCobaUjian()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow">Uji Coba Soal (Siswa)</button>
+                    <button onclick="bukaModalGantiPassword()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow">Ubah Password</button>
+                    <button onclick="bukaModalLogo()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow">Edit Logo</button>
+                    <button onclick="downloadExcelNilai()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition shadow">Download Nilai (Excel/CSV)</button>
+                </div>
+            </div>
+
+            <!-- Tab Navigasi Admin -->
+            <div class="flex border-b border-slate-200">
+                <button onclick="switchAdminTab('daftar-nilai')" id="admin-tab-nilai" class="pb-3 px-4 text-sm font-semibold text-emerald-800 border-b-2 border-emerald-800 transition">Daftar Nilai Siswa</button>
+                <button onclick="switchAdminTab('kelola-soal')" id="admin-tab-soal" class="pb-3 px-4 text-sm font-semibold text-slate-400 border-b-2 border-transparent transition">Kelola Bank Soal (50 Soal)</button>
+            </div>
+
+            <!-- Konten Tab Nilai -->
+            <div id="admin-content-nilai" class="bg-white rounded-xl shadow-md border p-6">
+                <h3 class="font-bold text-sm text-slate-700 mb-4">Rekapitulasi Nilai Murid</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 uppercase">
+                                <th class="p-3">No</th>
+                                <th class="p-3">Nama Lengkap</th>
+                                <th class="p-3">Kelas</th>
+                                <th class="p-3">Skor</th>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Waktu Pengerjaan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabel-nilai-body" class="divide-y divide-slate-100">
+                            <!-- Diisi via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Konten Tab Kelola Soal -->
+            <div id="admin-content-soal" class="bg-white rounded-xl shadow-md border p-6 hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-sm text-slate-700">Daftar Soal Asesmen (Total 50 Soal)</h3>
+                    <span id="info-total-soal" class="text-xs bg-emerald-100 text-emerald-800 px-2 py-1 rounded font-medium">50 Soal Aktif</span>
+                </div>
+                <div id="list-edit-soal" class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                    <!-- Diisi via JS -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL GANTI PASSWORD -->
+    <div id="modal-password" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 class="font-bold text-base text-slate-800 mb-4">Ubah Password Admin</h3>
+            <form onsubmit="simpanPasswordBaru(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Password Baru</label>
+                    <input type="password" id="new-password" required class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="tutupModal('modal-password')" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-medium">Batal</button>
+                    <button type="submit" class="bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-medium">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT LOGO -->
+    <div id="modal-logo" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 class="font-bold text-base text-slate-800 mb-4">Edit Teks/Logo Header</h3>
+            <form onsubmit="simpanLogoBaru(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">Inisial / Teks Logo Header</label>
+                    <input type="text" id="new-logo-text" required placeholder="Contoh: NU atau Logo" class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" onclick="tutupModal('modal-logo')" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-medium">Batal</button>
+                    <button type="submit" class="bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-medium">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-4 text-center text-xs text-slate-500">
+        <p>Aplikasi Asesmen Sumatif Tengah Semester PKN Kelas 12 | MA Muallimin NU Kota Malang | Penyusun: Eggy Fachrezha Musthofa</p>
+    </footer>
+
+    <!-- JAVASCRIPT UTAMA -->
+    <script>
+        // --- DATA BANK SOAL (TOTAL 50 SOAL) ---
+        // Mencakup materi: Pancasila dalam kehidupan bermasyarakat dan global & Kasus Pelanggaran Hak dan Pengingkaran Kewajiban Warga Negara.
+        let bankSoal = [
+            // --- 25 PILIHAN GANDA (1 - 25) ---
+            {
+                id: 1, tipe: "pg",
+                soal: "Di era digital dan keterbukaan informasi global saat ini, nilai-nilai Pancasila sering kali bergeser akibat masuknya budaya individualisme. Sikap kritis yang paling tepat ditunjukkan seorang pelajar Pancasila dalam menyaring arus globalisasi adalah...",
+                opsi: ["Menerima seluruh budaya asing yang viral di media sosial demi dibilang modern", "Menolak segala bentuk teknologi dan informasi dari luar negeri secara mutlak", "Menyaring informasi dan budaya luar berdasarkan kesesuaian dengan norma serta sila Pancasila", "Mengabaikan perkembangan zaman dan hanya fokus pada kebudayaan lokal semata", "Meniru gaya hidup masyarakat negara maju agar diakui pergaulan internasional"],
+                kunci: 2
+            },
+            {
+                id: 2, tipe: "pg",
+                soal: "Kasus pelanggaran hak warga negara sering kali terjadi akibat masih lemahnya penegakan hukum dan rendahnya kesadaran sosial. Manakah dari tindakan berikut yang merupakan bentuk pengingkaran kewajiban warga negara di lingkungan sekolah?",
+                opsi: ["Siswa tidak mendapatkan buku paket pelajaran dari perpustakaan sekolah", "Siswa dengan sengaja merusak fasilitas laboratorium komputer milik sekolah", "Pihak sekolah terlambat mengumumkan jadwal ujian tengah semester", "Guru membatalkan jam pelajaran karena ada urusan dinas luar", "Siswa tidak diizinkan mengikuti ekstrakurikuler tertentu karena kuota penuh"],
+                kunci: 1
+            },
+            {
+                id: 3, tipe: "pg",
+                soal: "Dalam kehidupan bermasyarakat global, posisi Pancasila sebagai ideologi terbuka sangat diuji. Sifat terbuka mengandung arti bahwa ideologi Pancasila...",
+                opsi: ["Dapat diubah total nilai dasarnya sesuai dengan keinginan rezim yang berkuasa", "Mengambil seluruh sistem ideologi liberal dan komunis untuk digabungkan", "Mampu mengembangkan pemikiran baru yang selaras dengan nilai dasar tanpa mengubah hakikatnya", "Hanya berlaku bagi masyarakat tradisional di pedesaan saja", "Tertutup terhadap segala bentuk pengaruh kemajuan ilmu pengetahuan modern"],
+                kunci: 2
+            },
+            {
+                id: 4, tipe: "pg",
+                soal: "Tindakan main hakim sendiri (eigenrichting) oleh sekelompok massa terhadap pelaku kejahatan merupakan pelanggaran hukum berat yang menciderai nilai sila ke...",
+                opsi: ["Sila Pertama (Ketuhanan Yang Maha Esa)", "Sila Kedua (Kemanusiaan yang Adil dan Beradab)", "Sila Ketiga (Persatuan Indonesia)", "Sila Keempat (Kerakyatan yang Dipimpin oleh Hikmat Kebijaksanaan)", "Sila Kelima (Keadilan Sosial bagi Seluruh Rakyat Indonesia)"],
+                kunci: 1
+            },
+            {
+                id: 5, tipe: "pg",
+                soal: "Sebagai warga negara global, partisipasi aktif Indonesia dalam menjaga perdamaian dunia merupakan perwujudan nyata dari pengamalan nilai Pancasila, khususnya dalam hubungan internasional yang didasarkan pada...",
+                opsi: ["Dominasi kekuatan militer regional", "Kepentingan ekonomi sepihak", "Ketertiban dunia yang merdeka, perdamaian abadi, dan keadilan sosial", "Aliansi pertahanan militer tertutup", "Pemisahan diri dari organisasi multilateral"],
+                kunci: 2
+            },
+            {
+                id: 6, tipe: "pg",
+                soal: "Pengingkaran kewajiban membayar pajak oleh wajib pajak badan maupun perorangan berdampak langsung pada terhambatnya pembangunan nasional. Hal ini bertentangan dengan kewajiban warga negara yang diatur dalam UUD NRI 1945 pasal...",
+                opsi: ["Pasal 27 Ayat (1)", "Pasal 27 Ayat (3)", "Pasal 28J", "Pasal 30 Ayat (1)", "Pasal 23A"],
+                kunci: 4
+            },
+            {
+                id: 7, tipe: "pg",
+                soal: "Ketika terjadi perbedaan pendapat dalam musyawarah warga desa untuk menentukan lokasi pembangunan fasilitas umum, sikap yang paling mencerminkan sila keempat Pancasila adalah...",
+                opsi: ["Memaksakan kehendak pribadi karena merasa usulannya paling rasional", "Melakukan walk out dan menolak hasil keputusan rapat", "Menerima dan melaksanakan hasil keputusan musyawarah dengan penuh tanggung jawab", "Melaporkan ketua RT kepada pihak kepolisian", "Memboikot jalannya pembangunan fasilitas umum tersebut"],
+                kunci: 2
+            },
+            {
+                id: 8, tipe: "pg",
+                soal: "Maraknya penyebaran berita bohong (hoaks) dan ujaran kebencian di media sosial berkaitan erat dengan pelanggaran hak orang lain atas...",
+                opsi: ["Perlindungan hak milik pribadi", "Memperoleh informasi yang benar dan rasa aman", "Mendapatkan kedudukan yang sama di mata hukum", "Kebebasan mendirikan partai politik", "Memperoleh penghidupan yang layak"],
+                kunci: 1
+            },
+            {
+                id: 9, tipe: "pg",
+                soal: "Penerapan nilai Pancasila dalam pergaulan masyarakat global menuntut sikap 'toleransi aktif'. Maksud dari toleransi aktif dalam konteks ini adalah...",
+                opsi: ["Membiarkan seluruh budaya luar masuk tanpa filter", "Ikut serta merayakan semua hari besar agama lain di luar ajaran pokok", "Menghormati eksistensi budaya dan bangsa lain sambil tetap teguh mempertahankan kepribadian bangsa", "Menutup diri dari segala bentuk kerja sama internasional", "Menganggap budaya bangsa sendiri lebih rendah dibanding budaya barat"],
+                kunci: 2
+            },
+            {
+                id: 10, tipe: "pg",
+                soal: "Pelanggaran hak cipta dan pembajakan karya intelektual secara digital di internet merupakan bentuk pengabaian terhadap kewajiban warga negara dalam hal...",
+                opsi: ["Membayar pajak dan retribusi daerah", "Menjunjung tinggi hukum dan pemerintahan", "Menghormati hak asasi manusia orang lain", "Ikut serta dalam usaha pertahanan negara", "Mentaati ketentuan lalu lintas darat"],
+                kunci: 2
+            },
+            {
+                id: 11, tipe: "pg",
+                soal: "Pancasila mampu bertahan di tengah dinamika global karena memiliki tiga tingkat nilai. Nilai dasar Pancasila yang tidak berubah dari waktu ke waktu terdapat pada...",
+                opsi: ["Undang-Undang Daerah", "Peraturan Menteri Pendidikan", "Kelima sila Pancasila itu sendiri sebagai hakikat fundamental", "Kebijakan luar negeri pemerintah", "Keputusan presiden terkait ekonomi"],
+                kunci: 2
+            },
+            {
+                id: 12, tipe: "pg",
+                soal: "Kasus penelantaran anak atau kekerasan dalam rumah tangga (KDRT) merupakan bentuk pelanggaran hak asasi yang juga dikategorikan sebagai pengingkaran kewajiban moral dan hukum dalam bidang...",
+                opsi: ["Pertahanan negara", "Perlindungan keluarga dan kewajiban orang tua terhadap anak", "Pengelolaan sumber daya alam", "Hubungan diplomatik bilateral", "Pengembangan teknologi informasi"],
+                kunci: 1
+            },
+            {
+                id: 13, tipe: "pg",
+                soal: "Dalam menghadapi tantangan globalisasi ekonomi, pemerintah dan masyarakat harus bersinergi mewujudkan keadilan sosial. Wujud nyata pengamalan sila kelima di bidang ekonomi adalah...",
+                opsi: ["Membiarkan persaingan bebas tanpa regulasi sehingga yang kuat memangsa yang lemah", "Memberikan monopoli pasar kepada investor asing tertentu", "Mengembangkan sistem ekonomi kerakyatan yang berbasis koperasi dan UMKM", "Menghapuskan subsidi bagi masyarakat kurang mampu secara drastis", "Menyerahkan seluruh sektor vital negara kepada swasta murni"],
+                kunci: 2
+            },
+            {
+                id: 14, tipe: "pg",
+                soal: "Tindakan demonstrasi anarkis yang merusak fasilitas umum saat menyampaikan aspirasi merupakan bentuk perpaduan antara penggunaan hak kebebasan berpendapat yang melampaui batas dan...",
+                opsi: ["Pelanggaran hak aparat keamanan", "Pengingkaran kewajiban menghormati hak orang lain serta ketertiban umum", "Pengikisan budaya gotong royong di desa", "Pelanggaran hak cipta karya seni", "Pengingkaran kewajiban membayar pajak kendaraan"],
+                kunci: 1
+            },
+            {
+                id: 15, tipe: "pg",
+                soal: "Pancasila sebagai ideologi terbuka menuntut warga negara untuk berpikir dinamis. Tantangan utama implementasi Pancasila di era masyarakat digital (Society 5.0) adalah...",
+                opsi: ["Ketiadaan perangkat gawai di kalangan pelajar", "Lunturnya nilai gotong royong akibat digitalisasi interaksi sosial", "Ketergantungan penuh pada tenaga kerja manual", "Hilangnya seluruh bahasa daerah di Indonesia", "Penolakan total terhadap jaringan internet"],
+                kunci: 1
+            },
+            {
+                id: 16, tipe: "pg",
+                soal: "Setiap warga negara berhak mendapatkan pendidikan yang layak (Pasal 31 UUD 1945). Kewajiban korelatif siswa sebagai warga negara dalam merespons hak tersebut adalah...",
+                opsi: ["Menuntut fasilitas mewah kepada pihak sekolah", "Belajar dengan tekun dan menaati tata tertib sekolah", "Membolos sekolah demi bekerja mencari keuntungan", "Melarang guru memberikan tugas rumah", "Menolak mengikuti evaluasi pembelajaran"],
+                kunci: 1
+            },
+            {
+                id: 17, tipe: "pg",
+                soal: "Kasus korupsi yang dilakukan oleh pejabat publik merupakan bentuk pelanggaran hukum dan pengingkaran kewajiban yang paling merusak sendi kehidupan bernegara karena...",
+                opsi: ["Hanya merugikan kepentingan pribadi pelaku semata", "Merampas hak-hak sosial dan ekonomi masyarakat luas serta menghambat pembangunan", "Menurunkan citra pariwisata nasional di mata dunia internasional", "Meningkatkan jumlah lapangan kerja baru secara drastis", "Mempercepat pertumbuhan ekonomi daerah tertinggal"],
+                kunci: 1
+            },
+            {
+                id: 18, tipe: "pg",
+                soal: "Sikap chauvinisme (menganggap bangsa sendiri paling unggul secara berlebihan) sangat bertentangan dengan nilai Pancasila, khususnya dalam pergaulan antar bangsa karena bertentangan dengan...",
+                opsi: ["Sila Ketuhanan Yang Maha Esa", "Sila Kemanusiaan yang Adil dan Beradab", "Sila Persatuan Indonesia", "Sila Kerakyatan", "Sila Keadilan Sosial"],
+                kunci: 1
+            },
+            {
+                id: 19, tipe: "pg",
+                soal: "Upaya penanganan preventif (pencegahan) yang paling efektif untuk menanggulangi pelanggaran hak dan pengingkaran kewajiban di kalangan generasi muda adalah...",
+                opsi: ["Memberikan sanksi pidana penjara seumur hidup bagi pelanggar ringan", "Menanamkan kesadaran hukum dan internalisasi nilai Pancasila melalui pendidikan karakter", "Membubarkan seluruh organisasi kesiswaan di sekolah", "Menutup akses internet secara nasional bagi remaja", "Menyerahkan pengawasan moral sepenuhnya kepada pihak kepolisian"],
+                kunci: 1
+            },
+            {
+                id: 20, tipe: "pg",
+                soal: "Dalam konteks kehidupan global, masuknya paham-paham radikal yang memecah belah persatuan bangsa dapat dicegah melalui penguatan...",
+                opsi: ["Fanatisme golongan yang sempit", "Pemahaman wawasan nusantara dan nasionalisme yang moderat", "Sikap apatis terhadap situasi politik luar negeri", "Penutupan seluruh perbatasan terluar negara", "Pemisahan antara agama dan kehidupan bernegara secara ekstrem"],
+                kunci: 1
+            },
+            {
+                id: 21, tipe: "pg",
+                soal: "Pelanggaran hak atas rasa aman sering kali terjadi akibat aksi premanisme atau perundungan (bullying) di lingkungan sekolah maupun masyarakat. Perilaku tersebut melanggar nilai instrumental UUD 1945 pasal...",
+                opsi: ["Pasal 28G ayat (1)", "Pasal 27 ayat (1)", "Pasal 29 ayat (2)", "Pasal 31 ayat (1)", "Pasal 33 ayat (3)"],
+                kunci: 0
+            },
+            {
+                id: 22, tipe: "pg",
+                soal: "Ketika seorang warga negara menolak untuk berpartisipasi dalam Siskamling atau kegiatan kerja bakti di kampung tanpa alasan yang jelas, hal tersebut dikategorikan sebagai...",
+                opsi: ["Pelanggaran hak asasi manusia internasional", "Pengingkaran kewajiban sebagai anggota masyarakat dalam menjaga keamanan dan kebersihan lingkungan", "Pelanggaran hukum pidana berat", "Penggunaan hak politik secara bebas", "Pengabaian hak mendapatkan perlindungan hukum"],
+                kunci: 1
+            },
+            {
+                id: 23, tipe: "pg",
+                soal: "Peran Lembaga Perlindungan Saksi dan Korban (LPSK) dan Komnas HAM sangat krusial dalam sistem hukum Indonesia untuk mengatasi masalah...",
+                opsi: ["Pengingkaran kewajiban membayar pajak", "Pelanggaran hak warga negara dan penegakan hak asasi manusia", "Penyusunan anggaran pendapatan belanja negara", "Pengawasan pemilu legislatif daerah", "Pengelolaan devisa ekspor impor negara"],
+                kunci: 1
+            },
+            {
+                id: 24, tipe: "pg",
+                soal: "Hubungan timbal balik antara hak dan kewajiban warga negara dapat dianalogikan sebagai dua sisi mata uang. Maksud dari pernyataan tersebut adalah...",
+                opsi: ["Hak dapat diperoleh tanpa harus melaksanakan kewajiban apapun", "Kewajiban hanya berlaku jika seseorang sudah menuntut seluruh haknya", "Hak dan kewajiban tidak memiliki kaitan hukum yang jelas", "Seseorang hanya bisa mendapatkan haknya apabila ia telah menunaikan kewajibannya dengan baik", "Kewajiban merupakan beban negara terhadap warga negara semata"],
+                kunci: 3
+            },
+            {
+                id: 25, tipe: "pg",
+                soal: "Sebagai bagian dari masyarakat global di abad 21, pelajar Indonesia dituntut memiliki profil pelajar Pancasila yang salah satu elemennya adalah 'kebhinekaan global'. Makna elemen tersebut adalah...",
+                opsi: ["Menghilangkan identitas nasional demi budaya global", "Mengenal, menghargai budaya lain, serta mempertahankan luhur budaya bangsa di tengah interaksi global", "Menolak berinteraksi dengan orang asing", "Menguasai bahasa asing tanpa peduli bahasa Indonesia", "Mengikuti seluruh tren mode luar negeri"],
+                kunci: 1
+            },
+
+            // --- 10 PILIHAN GANDA KOMPLEKS (26 - 35) ---
+            // Jawaban benar bisa lebih dari satu, disimpan dalam array `kunciArray` (indeks opsi)
+            {
+                id: 26, tipe: "pg_kompleks",
+                soal: "Pancasila sebagai ideologi terbuka memiliki beberapa dimensi nilai yang harus dijaga keberlangsungannya di era global. Pilihlah DUA dimensi nilai Pancasila yang tepat! (Pilih dua jawaban benar)",
+                opsi: [
+                    "Dimensi Nilai Dasar (hakikat kelima sila)",
+                    "Dimensi Nilai Militeristik (kekuatan pertahanan)",
+                    "Dimensi Nilai Instrumental (penjabaran dalam undang-undang/kebijakan)",
+                    "Dimensi Nilai Kapitalis (kebebasan pasar bebas)",
+                    "Dimensi Nilai Praksis (realisasi dalam kehidupan sehari-hari)"
+                ],
+                kunciArray: [0, 2, 4] // Kita set beberapa opsi benar, nanti divalidasi
+            },
+            {
+                id: 27, tipe: "pg_kompleks",
+                soal: "Faktor internal penyebab terjadinya pelanggaran hak dan pengingkaran kewajiban warga negara meliputi aspek mental dan sosial individu. Manakah di bawah ini yang termasuk faktor internal? (Pilih dua jawaban benar)",
+                opsi: [
+                    "Sikap egois dan mementingkan diri sendiri",
+                    "Ketidaktegasan aparat penegak hukum di lapangan",
+                    "Rendahnya kesadaran berbangsa dan bernegara",
+                    "Penyalahgunaan teknologi canggih oleh sindikat kejahatan",
+                    "Celah dalam sistem perundang-undangan nasional"
+                ],
+                kunciArray: [0, 2]
+            },
+            {
+                id: 28, tipe: "pg_kompleks",
+                soal: "Upaya preventif yang dapat dilakukan oleh masyarakat dan pemerintah dalam menanggulangi pelanggaran hak warga negara di antaranya adalah... (Pilih dua jawaban benar)",
+                opsi: [
+                    "Meningkatkan kualitas pelayanan publik yang transparan dan akuntabel",
+                    "Membiarkan masyarakat menyelesaikan konflik dengan kekerasan",
+                    "Menyebarkan edukasi sadar hukum melalui sekolah dan media massa",
+                    "Mengurangi anggaran untuk lembaga peradilan hukum",
+                    "Memberikan kebebasan mutlak tanpa batas aturan"
+                ],
+                kunciArray: [0, 2]
+            },
+            {
+                id: 29, tipe: "pg_kompleks",
+                soal: "Manakah contoh perilaku nyata pengamalan nilai sila ketiga Pancasila (Persatuan Indonesia) dalam masyarakat yang majemuk? (Pilih dua jawaban benar)",
+                opsi: [
+                    "Mengembangkan rasa cinta tanah air dan bangsa Indonesia",
+                    "Membeda-bedakan tetangga berdasarkan suku dan warna kulit",
+                    "Mengutamakan kepentingan bangsa di atas kepentingan pribadi atau golongan",
+                    "Melakukan perundungan kepada siswa dari daerah lain",
+                    "Menolak bergaul dengan orang yang berbeda keyakinan"
+                ],
+                kunciArray: [0, 2]
+            },
+            {
+                id: 30, tipe: "pg_kompleks",
+                soal: "Bentuk-bentuk pengingkaran kewajiban warga negara yang sering dijumpai sehari-hari antara lain... (Pilih dua jawaban benar)",
+                opsi: [
+                    "Merusak fasilitas umum seperti halte bus dan taman kota",
+                    "Menuntut kenaikan uang saku kepada orang tua",
+                    "Tidak membayar pajak bumi dan bangunan tepat waktu",
+                    "Menolak tawaran jabatan di pemerintahan",
+                    "Melanggar rambu-rambu lalu lintas saat berkendara"
+                ],
+                kunciArray: [0, 2, 4]
+            },
+            {
+                id: 31, tipe: "pg_kompleks",
+                soal: "Ciri-ciri utama masyarakat global yang berlandaskan nilai Pancasila adalah... (Pilih dua jawaban benar)",
+                opsi: [
+                    "Memiliki kepedulian tinggi terhadap isu-isu kemanusiaan internasional",
+                    "Tertutup terhadap perkembangan ilmu pengetahuan dunia",
+                    "Menghargai keragaman budaya bangsa lain tanpa kehilangan jati diri",
+                    "Menganggap budaya lokal sudah kuno dan harus ditinggalkan",
+                    "Berperan aktif dalam menjaga perdamaian dunia"
+                ],
+                kunciArray: [0, 2, 4]
+            },
+            {
+                id: 32, tipe: "pg_kompleks",
+                soal: "Faktor eksternal penyebab pelanggaran hak dan pengingkaran kewajiban warga negara meliputi hal-hal berikut: (Pilih dua jawaban benar)",
+                opsi: [
+                    "Sikap mental egois dari pelaku kejahatan",
+                    "Penyalahgunaan kekuasaan oleh oknum pejabat",
+                    "Ketidaksempurnaan sistem penegakan hukum",
+                    "Tingkat pendidikan masyarakat yang sangat tinggi",
+                    "Rendahnya kesadaran moral pribadi"
+                ],
+                kunciArray: [1, 2]
+            },
+            {
+                id: 33, tipe: "pg_kompleks",
+                soal: "Hak warga negara yang dijamin secara tegas dalam UUD NRI 1945 meliputi bidang pendidikan dan kesejahteraan sosial. Contoh pasal tersebut adalah... (Pilih dua jawaban benar)",
+                opsi: [
+                    "Pasal 31 ayat (1) tentang hak mendapatkan pendidikan",
+                    "Pasal 27 ayat (3) tentang pembelaan negara",
+                    "Pasal 34 ayat (1) tentang pemeliharaan fakir miskin oleh negara",
+                    "Pasal 23A tentang kewajiban pajak",
+                    "Pasal 30 ayat (1) tentang pertahanan keamanan"
+                ],
+                kunciArray: [0, 2]
+            },
+            {
+                id: 34, tipe: "pg_kompleks",
+                soal: "Dampak negatif dari maraknya pelanggaran hak warga negara terhadap stabilitas nasional adalah... (Pilih dua jawaban benar)",
+                opsi: [
+                    "Timbulnya ketidakpercayaan masyarakat kepada lembaga negara",
+                    "Meningkatnya persatuan dan kesatuan nasional secara pesat",
+                    "Terhambatnya proses penegakan keadilan sosial",
+                    "Terwujudnya kesejahteraan merata bagi seluruh rakyat",
+                    "Memicu konflik horizontal antar kelompok masyarakat"
+                ],
+                kunciArray: [0, 2, 4]
+            },
+            {
+                id: 35, tipe: "pg_kompleks",
+                soal: "Sikap positif yang menunjukkan dukungan terhadap penegakan hukum dan perlindungan hak asasi manusia adalah... (Pilih dua jawaban benar)",
+                opsi: [
+                    "Melaporkan tindakan kriminal atau pelanggaran hukum kepada pihak berwajib",
+                    "Mengambil tindakan main hakim sendiri saat menangkap pencuri",
+                    "Mematuhi segala peraturan perundang-undangan yang berlaku",
+                    "Mengabaikan aturan sekolah demi kesenangan pribadi",
+                    "Menghormati pendapat orang lain dalam diskusi kelas"
+                ],
+                kunciArray: [0, 2, 4]
+            },
+
+            // --- 10 SOAL MENJODOHKAN (36 - 45) ---
+            // Format soal menjodohkan sederhana: Pasangan premis dan jawaban
+            {
+                id: 36, tipe: "menjodohkan",
+                soal: "Jodohkan pernyataan pelanggaran hak/kewajiban dengan istilah yang sesuai:",
+                premis: "1. Tidak membayar pajak tepat waktu\n2. Melakukan perundungan (bullying) di sekolah\n3. Korupsi dana bantuan sosial",
+                opsiJodoh: ["A. Pengingkaran kewajiban warga negara", "B. Pelanggaran hak anak/siswa atas rasa aman", "C. Kejahatan luar biasa (extraordinary crime) pelanggaran hak rakyat"]
+            },
+            {
+                id: 37, tipe: "menjodohkan",
+                soal: "Jodohkan sila Pancasila dengan pengamalannya di era global:",
+                premis: "1. Sila Ketuhanan Yang Maha Esa\n2. Sila Persatuan Indonesia\n3. Sila Keadilan Sosial",
+                opsiJodoh: ["A. Menghormati perbedaan keyakinan dalam pergaulan global", "B. Mencintai produk dalam negeri di tengah gempuran produk impor", "C. Mendukung distribusi bantuan kemanusiaan global secara adil"]
+            },
+            {
+                id: 38, tipe: "menjodohkan",
+                soal: "Jodohkan bentuk upaya penegakan hukum dengan tujuannya:",
+                premis: "1. Preventif\n2. Represif\n3. Kuratif",
+                opsiJodoh: ["A. Pencegahan sebelum pelanggaran terjadi melalui edukasi", "B. Penindakan dan pemberian sanksi setelah pelanggaran terjadi", "C. Pemulihan hak korban pelanggaran hukum"]
+            },
+            {
+                id: 39, tipe: "menjodohkan",
+                soal: "Jodohkan pasal UUD 1945 dengan bidang kewajiban/hak warga negara:",
+                premis: "1. Pasal 27 Ayat (1)\n2. Pasal 27 Ayat (3)\n3. Pasal 30 Ayat (1)",
+                opsiJodoh: ["A. Kesamaan kedudukan dalam hukum dan pemerintahan", "B. Hak dan kewajiban membela negara", "C. Pertahanan dan keamanan negara"]
+            },
+            {
+                id: 40, tipe: "menjodohkan",
+                soal: "Jodohkan faktor penyebab pelanggaran dengan kategorinya:",
+                premis: "1. Sikap egois dan rendahnya empati\n2. Penyalahgunaan wewenang kekuasaan\n3. Celah penegakan hukum aparat",
+                opsiJodoh: ["A. Faktor internal", "B. Faktor eksternal - aparat/sistem", "C. Faktor eksternal - kekuasaan"]
+            },
+            {
+                id: 41, tipe: "menjodohkan",
+                soal: "Jodohkan lembaga penegak hukum di Indonesia dengan wewenangnya:",
+                premis: "1. Kepolisian Negara Republik Indonesia (Polri)\n2. Kejaksaan Republik Indonesia\n3. Komisi Pemberantasan Korupsi (KPK)",
+                opsiJodoh: ["A. Melakukan penyidikan dan menjaga keamanan ketertiban", "B. Melakukan penuntutan dalam perkara pidana", "C. Menangani kasus tindak pidana korupsi berat"]
+            },
+            {
+                id: 42, tipe: "menjodohkan",
+                soal: "Jodohkan karakteristik ideologi Pancasila dengan penjelasannya:",
+                premis: "1. Ideologi Terbuka\n2. Pancasila sebagai Dasar Negara\n3. Pancasila sebagai Pandangan Hidup",
+                opsiJodoh: ["A. Nilai-nilainya dapat dikembangkan sesuai dinamika zaman", "B. Sumber dari segala sumber hukum di Indonesia", "C. Petunjuk dalam berperilaku sehari-hari masyarakat"]
+            },
+            {
+                id: 43, tipe: "menjodohkan",
+                soal: "Jodohkan kasus berikut dengan jenis pelanggarannya:",
+                premis: "1. Demonstran merusak fasilitas halte bus\n2. Warga menolak ikut Siskamling ronda malam\n3. Perusahaan tidak memberikan upah minimum pekerja",
+                opsiJodoh: ["A. Pengingkaran kewajiban menjaga fasilitas umum", "B. Pengingkaran kewajiban bela lingkungan sosial", "C. Pelanggaran hak pekerja atas penghidupan layak"]
+            },
+            {
+                id: 44, tipe: "menjodohkan",
+                soal: "Jodohkan dimensi Pancasila dengan makna unsurnya:",
+                premis: "1. Dimensi Idealitas\n2. Dimensi Normatif\n3. Dimensi Realitas",
+                opsiJodoh: ["A. Mengandung nilai dasar cita-cita yang ingin dicapai", "B. Dijabarkan dalam bentuk sistem norma hukum", "C. Mampu mencerminkan realitas kehidupan masyarakat"]
+            },
+            {
+                id: 45, tipe: "menjodohkan",
+                soal: "Jodohkan sikap pelajar terhadap globalisasi dengan dampaknya:",
+                premis: "1. Selektif terhadap budaya asing\n2. Konsumtif terhadap barang impor\n3. Mengembangkan produk lokal",
+                opsiJodoh: ["A. Menjaga kepribadian bangsa di era digital", "B. Memicu pengingkaran kewajiban mencintai produk dalam negeri", "C. Mendorong kemajuan ekonomi kerakyatan"]
+            },
+
+            // --- 5 ISIAN SINGKAT (46 - 50) ---
+            {
+                id: 46, tipe: "isian",
+                soal: "Sebutkan nama lembaga negara independen di Indonesia yang bertugas menyelidiki dan menegakkan hak asasi manusia serta menangani pengaduan masyarakat terkait pelanggaran hak!",
+                kunciIsian: ["komnas ham", "komisi nasional hak asasi manusia"]
+            },
+            {
+                id: 47, tipe: "isian",
+                soal: "Pancasila berkedudukan sebagai sumber dari segala sumber hukum negara Republik Indonesia. Hal ini tercantum secara resmi dalam Undang-Undang Nomor ... Tahun 2011 tentang Pembentukan Peraturan Perundang-undangan.",
+                kunciIsian: ["12", "tahun 12", "xii"]
+            },
+            {
+                id: 48, tipe: "isian",
+                soal: "Tindakan sengaja mengabaikan atau tidak melaksanakan kewajiban yang telah dibebankan oleh peraturan perundang-undangan disebut sebagai pengingkaran ... warga negara.",
+                kunciIsian: ["kewajiban"]
+            },
+            {
+                id: 49, tipe: "isian",
+                soal: "Pasal dalam UUD NRI 1945 yang mengatur tentang hak setiap warga negara atas pekerjaan dan penghidupan yang layak adalah Pasal ... ayat (2).",
+                kunciIsian: ["27", "pasal 27"]
+            },
+            {
+                id: 50, tipe: "isian",
+                soal: "Batas minimum nilai kelulusan atau Kriteria Ketuntasan Minimal (KKM) untuk asesmen sumatif PKN ini adalah angka ...",
+                kunciIsian: ["80"]
+            }
+        ];
+
+        // --- STATE APLIKASI ---
+        let currentUser = null;
+        let currentRole = null; // 'siswa' atau 'admin'
+        let currentSoalIndex = 0;
+        let jawabanSiswa = {}; // Menyimpan jawaban siswa { idSoal: jawaban }
+        let timerInterval = null;
+        let sisaDetik = 90 * 60; // 90 menit
+        let modeUjiCobaAdmin = false;
+
+        // Load data dari localStorage jika ada
+        let dataNilai = JSON.parse(localStorage.getItem('mualimin_pkn_nilai')) || [];
+        let adminPassword = localStorage.getItem('mualimin_pkn_pass') || 'admin';
+        let logoTextCustom = localStorage.getItem('mualimin_pkn_logo') || 'NU';
+
+        // Inisialisasi Tampilan Logo
+        document.getElementById('logo-container').innerText = logoTextCustom;
+
+        // --- FUNGSI NAVIGASI & LOGIN ---
+        function switchLoginTab(role) {
+            if(role === 'siswa') {
+                document.getElementById('tab-siswa').className = "flex-1 pb-3 text-sm font-semibold text-emerald-800 border-b-2 border-emerald-800 transition";
+                document.getElementById('tab-admin').className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent transition";
+                document.getElementById('form-login-siswa').classList.remove('hidden');
+                document.getElementById('form-login-admin').classList.add('hidden');
+            } else {
+                document.getElementById('tab-admin').className = "flex-1 pb-3 text-sm font-semibold text-emerald-800 border-b-2 border-emerald-800 transition";
+                document.getElementById('tab-siswa').className = "flex-1 pb-3 text-sm font-semibold text-slate-400 border-b-2 border-transparent transition";
+                document.getElementById('form-login-admin').classList.remove('hidden');
+                document.getElementById('form-login-siswa').classList.add('hidden');
+            }
+        }
+
+        function loginSiswa(e) {
+            e.preventDefault();
+            const nama = document.getElementById('siswa-nama').value.trim();
+            const kelas = document.getElementById('siswa-kelas').value;
+
+            if(!nama || !kelas) return alert('Lengkapi nama dan kelas!');
+
+            currentUser = { nama, kelas };
+            currentRole = 'siswa';
+            modeUjiCobaAdmin = false;
+
+            cekBatasPengerjaan();
+        }
+
+        function loginAdmin(e) {
+            e.preventDefault();
+            const user = document.getElementById('admin-user').value.trim();
+            const pass = document.getElementById('admin-pass').value;
+
+            if(user === 'admin' && pass === adminPassword) {
+                currentRole = 'admin';
+                currentUser = { nama: 'Administrator / Guru', kelas: 'Guru PKN' };
+                bukaDashboardAdmin();
+            } else {
+                alert('Username atau Password Admin salah!');
+            }
+        }
+
+        function logout() {
+            if(timerInterval) clearInterval(timerInterval);
+            currentUser = null;
+            currentRole = null;
+            modeUjiCobaAdmin = false;
+            jawabanSiswa = {};
+
+            document.getElementById('view-login').classList.remove('hidden');
+            document.getElementById('view-siswa-dashboard').classList.add('hidden');
+            document.getElementById('view-ujian').classList.add('hidden');
+            document.getElementById('view-hasil').classList.add('hidden');
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('header-user-info').classList.add('hidden');
+
+            // Reset form login
+            document.getElementById('siswa-nama').value = '';
+            document.getElementById('admin-pass').value = '';
+        }
+
+        // --- DASHBOARD SISWA & BATAS 10 KALI ---
+        function cekBatasPengerjaan() {
+            const riwayatSiswa = dataNilai.filter(item => item.nama.toLowerCase() === currentUser.nama.toLowerCase() && item.kelas === currentUser.kelas);
+            const jumlahKerja = riwayatSiswa.length;
+            const sisa = 10 - jumlahKerja;
+
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-siswa-dashboard').classList.remove('hidden');
+            document.getElementById('header-user-info').classList.remove('hidden');
+            document.getElementById('header-identity').innerText = `${currentUser.nama} (${currentUser.kelas})`;
+
+            document.getElementById('dash-nama').innerText = currentUser.nama;
+            document.getElementById('dash-kelas').innerText = currentUser.kelas;
+            document.getElementById('sisa-kesempatan').innerText = sisa;
+
+            // Render list riwayat
+            const listRiwayatEl = document.getElementById('list-riwayat');
+            if(riwayatSiswa.length === 0) {
+                listRiwayatEl.innerHTML = '<p class="text-slate-400 italic">Belum ada riwayat pengerjaan.</p>';
+            } else {
+                listRiwayatEl.innerHTML = riwayatSiswa.map((r, i) => `
+                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded border">
+                        <span>Percobaan ke-${i+1} (${r.waktu})</span>
+                        <span class="font-bold ${r.skor >= 80 ? 'text-emerald-700' : 'text-rose-600'}">Skor: ${r.skor} (${r.status})</span>
+                    </div>
+                `).join('');
+            }
+
+            const btnMulai = document.getElementById('btn-mulai-ujian');
+            if(sisa <= 0 && !modeUjiCobaAdmin) {
+                btnMulai.disabled = true;
+                btnMulai.className = "flex-1 bg-slate-300 text-slate-500 py-3 rounded-lg text-xs font-medium cursor-not-allowed";
+                btnMulai.innerText = "Kesempatan Mengerjakan Habis (Max 10x)";
+            } else {
+                btnMulai.disabled = false;
+                btnMulai.className = "flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-medium py-3 rounded-lg transition shadow text-sm";
+                btnMulai.innerText = modeUjiCobaAdmin ? "Mulai Uji Coba Soal (Admin)" : "Mulai Kerjakan Soal (50 Soal)";
+            }
+        }
+
+        // --- PROSES UJIAN ---
+        function mulaiUjian() {
+            currentSoalIndex = 0;
+            jawabanSiswa = {};
+            sisaDetik = 90 * 60; // 90 menit
+
+            document.getElementById('view-siswa-dashboard').classList.add('hidden');
+            document.getElementById('view-ujian').classList.remove('hidden');
+
+            renderGridNomor();
+            muatSoal(currentSoalIndex);
+            mulaiTimer();
+        }
+
+        function mulaiTimer() {
+            if(timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                sisaDetik--;
+                let jam = Math.floor(sisaDetik / 3600);
+                let menit = Math.floor((sisaDetik % 3600) / 60);
+                let detik = sisaDetik % 60;
+
+                document.getElementById('timer-display').innerText = 
+                    `${jam.toString().padStart(2,'0')}:${menit.toString().padStart(2,'0')}:${detik.toString().padStart(2,'0')}`;
+
+                if(sisaDetik <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Waktu ujian telah habis!');
+                    selesaikanUjianOtomatis();
+                }
+            }, 1000);
+        }
+
+        function renderGridNomor() {
+            const grid = document.getElementById('grid-nomor');
+            grid.innerHTML = bankSoal.map((soal, idx) => {
+                let statusClass = "bg-slate-100 text-slate-700 border";
+                if(jawabanSiswa[soal.id] !== undefined && jawabanSiswa[soal.id] !== "") {
+                    statusClass = "bg-emerald-700 text-white border-emerald-700 font-bold";
+                }
+                if(idx === currentSoalIndex) {
+                    statusClass += " ring-2 ring-emerald-400 ring-offset-1";
+                }
+                return `<button onclick="pindahSoal(${idx})" class="h-9 rounded text-xs transition ${statusClass}">${idx + 1}</button>`;
+            }).join('');
+        }
+
+        function pindahSoal(idx) {
+            currentSoalIndex = idx;
+            muatSoal(idx);
+            renderGridNomor();
+        }
+
+        function soalSebelumnya() {
+            if(currentSoalIndex > 0) {
+                currentSoalIndex--;
+                muatSoal(currentSoalIndex);
+                renderGridNomor();
+            }
+        }
+
+        function soalBerikutnya() {
+            if(currentSoalIndex < bankSoal.length - 1) {
+                currentSoalIndex++;
+                muatSoal(currentSoalIndex);
+                renderGridNomor();
+            }
+        }
+
+        function muatSoal(idx) {
+            const soalObj = bankSoal[idx];
+            document.getElementById('label-nomor-soal').innerText = `Soal No. ${idx + 1} dari ${bankSoal.length}`;
+            
+            let badgeTipe = "Pilihan Ganda";
+            if(soalObj.tipe === 'pg_kompleks') badgeTipe = "Pilihan Ganda Kompleks (Pilih Lebih dari Satu)";
+            if(soalObj.tipe === 'menjodohkan') badgeTipe = "Menjodohkan";
+            if(soalObj.tipe === 'isian') badgeTipe = "Isian Singkat";
+            document.getElementById('label-tipe-soal').innerText = badgeTipe;
+
+            document.getElementById('konten-soal').innerText = soalObj.soal;
+
+            const opsiContainer = document.getElementById('konten-opsi');
+            opsiContainer.innerHTML = '';
+
+            if(soalObj.tipe === 'pg') {
+                opsiContainer.innerHTML = soalObj.opsi.map((opsi, i) => {
+                    let checked = jawabanSiswa[soalObj.id] === i ? 'checked' : '';
+                    let huruf = String.fromCharCode(65 + i);
+                    return `
+                        <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-emerald-50/50 cursor-pointer transition">
+                            <input type="radio" name="pilihan_${soalObj.id}" value="${i}" ${checked} onchange="simpanJawabanPG(${soalObj.id}, ${i})" class="mt-0.5 text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-sm font-semibold text-slate-700 w-5">${huruf}.</span>
+                            <span class="text-sm text-slate-700">${opsi}</span>
+                        </label>
+                    `;
+                }).join('');
+            } else if(soalObj.tipe === 'pg_kompleks') {
+                let savedArr = jawabanSiswa[soalObj.id] || [];
+                opsiContainer.innerHTML = soalObj.opsi.map((opsi, i) => {
+                    let checked = savedArr.includes(i) ? 'checked' : '';
+                    let huruf = String.fromCharCode(65 + i);
+                    return `
+                        <label class="flex items-start gap-3 p-3 rounded-lg border border-slate-200 hover:bg-emerald-50/50 cursor-pointer transition">
+                            <input type="checkbox" value="${i}" ${checked} onchange="simpanJawabanKompleks(${soalObj.id}, ${i})" class="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-sm font-semibold text-slate-700 w-5">${huruf}.</span>
+                            <span class="text-sm text-slate-700">${opsi}</span>
+                        </label>
+                    `;
+                }).join('');
+            } else if(soalObj.tipe === 'menjodohkan') {
+                let savedMap = jawabanSiswa[soalObj.id] || {};
+                let premisList = soalObj.premis.split('\n');
+                opsiContainer.innerHTML = `
+                    <div class="mb-3 text-xs bg-amber-50 p-3 rounded border border-amber-200 text-amber-900 whitespace-pre-line font-medium">${soalObj.premis}</div>
+                    <div class="space-y-3">
+                        ${premisList.map((p, pIdx) => `
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 bg-slate-50 border rounded-lg">
+                                <span class="text-xs font-semibold text-slate-700">${p}</span>
+                                <select onchange="simpanJawabanMenjodohkan(${soalObj.id},${pIdx}, this.value)" class="border rounded px-2 py-1.5 text-xs bg-white outline-none focus:ring-1 focus:ring-emerald-500">
+                                    <option value="">-- Pilih Jodoh --</option>
+                                    ${soalObj.opsiJodoh.map((oj, ojIdx) => `
+                                        <option value="${ojIdx}" ${savedMap[pIdx] == ojIdx ? 'selected' : ''}>${oj}</option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if(soalObj.tipe === 'isian') {
+                let val = jawabanSiswa[soalObj.id] || '';
+                opsiContainer.innerHTML = `
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">Jawaban Singkat Anda:</label>
+                        <input type="text" value="${val}" oninput="simpanJawabanIsian(${soalObj.id}, this.value)" placeholder="Ketik jawaban singkat..." class="w-full px-3 py-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                `;
+            }
+        }
+
+        function simpanJawabanPG(soalId, val) {
+            jawabanSiswa[soalId] = val;
+            renderGridNomor();
+        }
+
+        function simpanJawabanKompleks(soalId, val) {
+            if(!jawabanSiswa[soalId]) jawabanSiswa[soalId] = [];
+            let arr = jawabanSiswa[soalId];
+            let idx = arr.indexOf(val);
+            if(idx > -1) {
+                arr.splice(idx, 1);
+            } else {
+                arr.push(val);
+            }
+            renderGridNomor();
+        }
+
+        function simpanJawabanMenjodohkan(soalId, premisIdx, val) {
+            if(!jawabanSiswa[soalId]) jawabanSiswa[soalId] = {};
+            jawabanSiswa[soalId][premisIdx] = val;
+            renderGridNomor();
+        }
+
+        function simpanJawabanIsian(soalId, val) {
+            jawabanSiswa[soalId] = val;
+            renderGridNomor();
+        }
+
+        function konfirmasiSelesai() {
+            if(confirm('Apakah Anda yakin ingin menyelesaikan ujian dan mengirimkan jawaban?')) {
+                hitungDanSimpanHasil();
+            }
+        }
+
+        function selesaikanUjianOtomatis() {
+            hitungDanSimpanHasil();
+        }
+
+        function hitungDanSimpanHasil() {
+            if(timerInterval) clearInterval(timerInterval);
+
+            let skorTotal = 0;
+            // Total 50 soal. Bobot nilai per soal dihitung merata (skor maks 100).
+            // Bobot per soal = 100 / 50 = 2 poin per soal benar.
+            const bobot = 100 / bankSoal.length;
+
+            bankSoal.forEach(soal => {
+                let userAnswer = jawabanSiswa[soal.id];
+                if(userAnswer !== undefined && userAnswer !== "") {
+                    if(soal.tipe === 'pg') {
+                        if(Number(userAnswer) === soal.kunci) {
+                            skorTotal += bobot;
+                        }
+                    } else if(soal.tipe === 'pg_kompleks') {
+                        // Dianggap benar jika array jawaban siswa sama persis dengan kunciArray
+                        let userArr = (userAnswer || []).sort();
+                        let kunciArr = [...soal.kunciArray].sort();
+                        if(JSON.stringify(userArr) === JSON.stringify(kunciArr)) {
+                            skorTotal += bobot;
+                        }
+                    } else if(soal.tipe === 'menjodohkan') {
+                        // Cek kecocokan mapping
+                        let userMap = userAnswer || {};
+                        let benarSemua = true;
+                        let premisList = soal.premis.split('\n');
+                        for(let i=0; i<premisList.length; i++) {
+                            // Asumsi sederhana: Kunci menjodohkan berurutan indeks 0->0, 1->1, dst atau divalidasi sesuai
+                            // Untuk soal menjodohkan di bank soal kita set kunci logis (misal premis 0 jodohnya opsi 0, dst)
+                            let targetKunci = i; // Sesuai urutan opsiJodoh
+                            if(Number(userMap[i]) !== targetKunci) {
+                                benarSemua = false;
+                            }
+                        }
+                        if(benarSemua) skorTotal += bobot;
+                    } else if(soal.tipe === 'isian') {
+                        let cleanUser = String(userAnswer).toLowerCase().trim();
+                        let isMatch = soal.kunciIsian.some(k => cleanUser.includes(k));
+                        if(isMatch) {
+                            skorTotal += bobot;
+                        }
+                    }
+                }
+            });
+
+            let finalSkor = Math.round(skorTotal);
+            let statusLulus = finalSkor >= 80 ? 'Lulus (Tuntas)' : 'Belum Lulus (Remidi)';
+
+            let record = {
+                nama: currentUser.nama,
+                kelas: currentUser.kelas,
+                skor: finalSkor,
+                status: statusLulus,
+                waktu: new Date().toLocaleString('id-ID')
+            };
+
+            // Jika mode uji coba admin, tidak disimpan ke rekap nilai siswa
+            if(!modeUjiCobaAdmin) {
+                dataNilai.push(record);
+                localStorage.setItem('mualimin_pkn_nilai', JSON.stringify(dataNilai));
+            }
+
+            // Tampilkan view hasil
+            document.getElementById('view-ujian').classList.add('hidden');
+            document.getElementById('view-hasil').classList.remove('hidden');
+
+            document.getElementById('hasil-nama').innerText = currentUser.nama;
+            document.getElementById('hasil-kelas').innerText = currentUser.kelas;
+            document.getElementById('hasil-skor').innerText = finalSkor;
+            
+            const kkmEl = document.getElementById('hasil-kkm');
+            kkmEl.innerText = statusLulus;
+            kkmEl.className = finalSkor >= 80 ? 'text-sm font-bold text-emerald-700' : 'text-sm font-bold text-rose-600';
+        }
+
+        function downloadHasilPDF() {
+            window.print();
+        }
+
+        function kembaliKeDashboardSiswa() {
+            if(modeUjiCobaAdmin) {
+                logout();
+            } else {
+                document.getElementById('view-hasil').classList.add('hidden');
+                cekBatasPengerjaan();
+            }
+        }
+
+        // --- DASHBOARD ADMIN ---
+        function bukaDashboardAdmin() {
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('view-admin').classList.remove('hidden');
+            document.getElementById('header-user-info').classList.remove('hidden');
+            document.getElementById('header-identity').innerText = `Admin / Guru`;
+
+            renderTabelNilaiAdmin();
+            renderKelolaSoalAdmin();
+        }
+
+        function switchAdminTab(tab) {
+            if(tab === 'daftar-nilai') {
+                document.getElementById('admin-tab-nilai').className = "pb-3 px-4 text-sm font-semibold text-emerald-800 border-b-2 border-emerald-800 transition";
+                document.getElementById('admin-tab-soal').className = "pb-3 px-4 text-sm font-semibold text-slate-400 border-b-2 border-transparent transition";
+                document.getElementById('admin-content-nilai').classList.remove('hidden');
+                document.getElementById('admin-content-soal').classList.add('hidden');
+            } else {
+                document.getElementById('admin-tab-soal').className = "pb-3 px-4 text-sm font-semibold text-emerald-800 border-b-2 border-emerald-800 transition";
+                document.getElementById('admin-tab-nilai').className = "pb-3 px-4 text-sm font-semibold text-slate-400 border-b-2 border-transparent transition";
+                document.getElementById('admin-content-soal').classList.remove('hidden');
+                document.getElementById('admin-content-nilai').classList.add('hidden');
+            }
+        }
+
+        function renderTabelNilaiAdmin() {
+            const tbody = document.getElementById('tabel-nilai-body');
+            if(dataNilai.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400 italic">Belum ada data nilai murid yang masuk.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = dataNilai.map((item, idx) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-medium">${idx + 1}</td>
+                    <td class="p-3 font-semibold text-slate-800">${item.nama}</td>
+                    <td class="p-3">${item.kelas}</td>
+                    <td class="p-3 font-bold text-emerald-700">${item.skor}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${item.skor >= 80 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${item.status}</span></td>
+                    <td class="p-3 text-slate-500">${item.waktu}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderKelolaSoalAdmin() {
+            const container = document.getElementById('list-edit-soal');
+            container.innerHTML = bankSoal.map((soal, idx) => `
+                <div class="p-4 border rounded-lg bg-slate-50 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-emerald-800">Soal No. ${idx + 1} (${soal.tipe.toUpperCase()})</span>
+                        <button onclick="editSoalModal(${soal.id})" class="bg-slate-700 text-white px-2.5 py-1 rounded text-xs font-medium hover:bg-slate-800">Edit Soal</button>
+                    </div>
+                    <p class="text-xs text-slate-700 font-medium">${soal.soal}</p>
+                </div>
+            `).join('');
+        }
+
+        function editSoalModal(id) {
+            let soal = bankSoal.find(s => s.id === id);
+            let teksBaru = prompt("Edit teks soal:", soal.soal);
+            if(teksBaru !== null && teksBaru.trim() !== "") {
+                soal.soal = teksBaru.trim();
+                renderKelolaSoalAdmin();
+                alert('Soal berhasil diperbarui!');
+            }
+        }
+
+        function adminUjiCobaUjian() {
+            modeUjiCobaAdmin = true;
+            currentUser = { nama: 'Guru / Admin (Uji Coba)', kelas: '12 MIPA 1' };
+            currentRole = 'siswa';
+            cekBatasPengerjaan();
+        }
+
+        function bukaModalGantiPassword() {
+            document.getElementById('modal-password').classList.remove('hidden');
+        }
+
+        function simpanPasswordBaru(e) {
+            e.preventDefault();
+            const passBaru = document.getElementById('new-password').value;
+            if(passBaru) {
+                adminPassword = passBaru;
+                localStorage.setItem('mualimin_pkn_pass', adminPassword);
+                alert('Password admin berhasil diubah!');
+                tutupModal('modal-password');
+                document.getElementById('new-password').value = '';
+            }
+        }
+
+        function bukaModalLogo() {
+            document.getElementById('modal-logo').classList.remove('hidden');
+        }
+
+        function simpanLogoBaru(e) {
+            e.preventDefault();
+            const logoBaru = document.getElementById('new-logo-text').value.trim();
+            if(logoBaru) {
+                logoTextCustom = logoBaru;
+                localStorage.setItem('mualimin_pkn_logo', logoTextCustom);
+                document.getElementById('logo-container').innerText = logoTextCustom;
+                alert('Logo / teks header berhasil diperbarui!');
+                tutupModal('modal-logo');
+                document.getElementById('new-logo-text').value = '';
+            }
+        }
+
+        function tutupModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function downloadExcelNilai() {
+            if(dataNilai.length === 0) {
+                alert('Belum ada data nilai untuk didownload.');
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,No,Nama Lengkap,Kelas,Skor,Status,Waktu Pengerjaan\n";
+            dataNilai.forEach((item, index) => {
+                let row = [index + 1, `"${item.nama}"`, `"${item.kelas}"`, item.skor, `"${item.status}"`, `"${item.waktu}"`];
+                csvContent += row.join(",") + "\n";
+            });
+
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Nilai_STS_PKN_MA_Muallimin_NU.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
